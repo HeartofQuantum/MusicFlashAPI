@@ -123,7 +123,7 @@ namespace MusicFlashApi.Controllers
             return Ok();
         }
 
-        [Route("uer/{id:guid}")]
+        [Route("user/{id:guid}")]
         public async Task<IHttpActionResult> DeleteUser(string id)
         {
             //Only superdmin or Admin care delete users
