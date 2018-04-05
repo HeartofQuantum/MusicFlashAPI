@@ -7,6 +7,9 @@ using System.Web.Http;
 using MusicFlashApi.Models;
 using System.Net.Http.Formatting;
 using Newtonsoft.Json.Serialization;
+using Microsoft.Owin;
+using MusicFlashApi.Providers;
+using Microsoft.Owin.Security.OAuth;
 
 namespace MusicFlashApi
 {
@@ -30,7 +33,18 @@ namespace MusicFlashApi
             // Configure the db context and user manager to use a single instance per request
             app.CreatePerOwinContext(ApplicationDbContext.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
-            //Plugin the OAuth bearer json web Token tokes generation and Consumption will be here
+
+            OAuthAuthorizationServerOptions OAuthServerOptions = new OAuthAuthorizationServerOptions()
+            {
+                // For Dev environment only on production should be AllowInsecureHttp = false
+                AllowInsecureHttp = true,
+                TokenEndpointPath = new PathString("/oauth/token"),
+                AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
+                Provider = new CustomOAuthProvider(),
+                AccessTokenFormat = new CustomJwtFormat("Http://localhost:53186")
+            };
+
+            app.UseOAuthAuthorizationServer(OAuthServerOptions);
         }
 
         private void ConfigureWebApi(HttpConfiguration config)
@@ -41,5 +55,6 @@ namespace MusicFlashApi
             jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
         }
+
     }
 }

@@ -5,6 +5,9 @@ using System.Web;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.AspNet.Identity;
 
 namespace MusicFlashApi.Models
 {
@@ -23,5 +26,13 @@ namespace MusicFlashApi.Models
 
         [Required]
         public DateTime JoinDate { get; set; }
+
+        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType)
+        {
+            var userIdentity = await manager.CreateIdentityAsync(this, authenticationType);
+            // Add custom user claims here
+
+            return userIdentity;
+        }
     }
 }
