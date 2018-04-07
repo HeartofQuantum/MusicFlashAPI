@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using MusicFlashApi.Infrastructure;
 using MusicFlashApi.Models;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,19 @@ namespace MusicFlashApi.Controllers
     {
         private ModelFactory _modelFactory;
         private ApplicationUserManager _AppUserManager = null;
+        private ApplicationRoleManager _AppRoleManager = null;
+
+        public BaseApiController()
+        {
+        }
+
+        protected ApplicationRoleManager AppRoleManager
+        {
+            get
+            {
+                return _AppRoleManager ?? Request.GetOwinContext().GetUserManager<ApplicationRoleManager>();
+            }
+        }
 
         protected ApplicationUserManager AppUserManager
         {
@@ -21,10 +35,6 @@ namespace MusicFlashApi.Controllers
             {
                 return _AppUserManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
             }
-        }
-
-        public BaseApiController()
-        {
         }
 
         protected ModelFactory TheModelFactory

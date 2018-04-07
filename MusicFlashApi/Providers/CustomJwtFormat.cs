@@ -29,7 +29,7 @@ namespace MusicFlashApi.Providers
             string audienceId = ConfigurationManager.AppSettings["as:AudienceId"];
 
             string symmetricKeyAsBase64 = ConfigurationManager.AppSettings["as:AudienceSecret"];
-            
+
             var keyByteArray = TextEncodings.Base64Url.Decode(symmetricKeyAsBase64); // returning null?
 
             var signingKey = new HmacSigningCredentials(keyByteArray);

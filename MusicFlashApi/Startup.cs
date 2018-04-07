@@ -1,15 +1,21 @@
-﻿using Owin;
+﻿using Microsoft.Owin;
+using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.DataHandler.Encoder;
+using Microsoft.Owin.Security.Jwt;
+using Microsoft.Owin.Security.OAuth;
+using MusicFlashApi.Infrastructure;
+using MusicFlashApi.Models;
+using MusicFlashApi.Providers;
+using Newtonsoft.Json.Serialization;
+using Owin;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Net.Http.Formatting;
 using System.Web;
 using System.Web.Http;
-using MusicFlashApi.Models;
-using System.Net.Http.Formatting;
-using Newtonsoft.Json.Serialization;
-using Microsoft.Owin;
-using MusicFlashApi.Providers;
-using Microsoft.Owin.Security.OAuth;
+
 
 namespace MusicFlashApi
 {
@@ -21,6 +27,8 @@ namespace MusicFlashApi
 
             ConfigureOAuthTokenGeneration(app);
 
+            ConfigureOAuthTokenConsumption(app);
+
             ConfigureWebApi(httpConfig);
 
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
@@ -31,8 +39,11 @@ namespace MusicFlashApi
         private void ConfigureOAuthTokenGeneration(IAppBuilder app)
         {
             // Configure the db context and user manager to use a single instance per request
+
             app.CreatePerOwinContext(ApplicationDbContext.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
+
+            app.CreatePerOwinContext<ApplicationRoleManager>(ApplicationRoleManager.Create);
 
             OAuthAuthorizationServerOptions OAuthServerOptions = new OAuthAuthorizationServerOptions()
             {
@@ -41,10 +52,29 @@ namespace MusicFlashApi
                 TokenEndpointPath = new PathString("/oauth/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
                 Provider = new CustomOAuthProvider(),
-                AccessTokenFormat = new CustomJwtFormat("Http://localhost:53186")
+                AccessTokenFormat = new CustomJwtFormat("http://localhost:53186")
             };
 
             app.UseOAuthAuthorizationServer(OAuthServerOptions);
+        }
+
+        private void ConfigureOAuthTokenConsumption(IAppBuilder app)
+        {
+            var issuer = "http://localhost:53186";
+            string audienceId = ConfigurationManager.AppSettings["as:AudienceId"];
+            byte[] audienceSecret = TextEncodings.Base64Url.Decode(ConfigurationManager.AppSettings["as:AudienceSecret"]);
+
+            // api controllers with an [authorize] attribute will be validated with JWT
+            app.UseJwtBearerAuthentication(
+                new JwtBearerAuthenticationOptions
+                {
+                    AuthenticationMode = AuthenticationMode.Active,
+                    AllowedAudiences = new[] { audienceId },
+                    IssuerSecurityTokenProviders = new IIssuerSecurityTokenProvider[]
+                    {
+                        new SymmetricKeyIssuerSecurityTokenProvider(issuer, audienceSecret)
+                    }
+                });
         }
 
         private void ConfigureWebApi(HttpConfiguration config)
