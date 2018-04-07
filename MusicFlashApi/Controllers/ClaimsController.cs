@@ -8,6 +8,8 @@ using System.Web.Http;
 
 namespace MusicFlashApi.Controllers
 {
+
+    [RoutePrefix("api/claims")]
     public class ClaimsController : BaseApiController
     {
         [Authorize]
