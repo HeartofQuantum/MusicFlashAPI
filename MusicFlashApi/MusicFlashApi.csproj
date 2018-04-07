@@ -198,6 +198,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\ApplicationRoleManager.cs" />
+    <Compile Include="Infrastructure\ClaimsAuthorizationAttribute.cs" />
     <Compile Include="Migrations\201804032307160_InitialCreate.cs" />
     <Compile Include="Migrations\201804032307160_InitialCreate.Designer.cs">
       <DependentUpon>201804032307160_InitialCreate.cs</DependentUpon>
