@@ -208,6 +208,7 @@
     <Compile Include="Infrastructure\ApplicationDbContext.cs" />
     <Compile Include="Infrastructure\ApplicationUser.cs" />
     <Compile Include="Infrastructure\ApplicationUserManager.cs" />
+    <Compile Include="Models\ClaimBindingModel.cs" />
     <Compile Include="Models\ModelFactory.cs" />
     <Compile Include="Models\RoleBindingModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
